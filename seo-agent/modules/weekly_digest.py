@@ -179,7 +179,9 @@ def content_factory_published(week_ago: dt.date) -> list[dict]:
 def yandex_webmaster_summary() -> dict:
     """ИКС и количество страниц в индексе."""
     try:
-        from modules.yandex_webmaster import yw_get_user_id, yw_list_hosts, yw_host_info
+        from modules.yandex_webmaster import (
+            yw_get_user_id, yw_list_hosts, yw_host_info, yw_sqi_latest,
+        )
         user_id = yw_get_user_id()
         hosts = yw_list_hosts(user_id)
         domain = site_domain()
@@ -187,8 +189,10 @@ def yandex_webmaster_summary() -> dict:
             url = h.get("unicode_host_url", "")
             if domain in url and url.startswith("https"):
                 info = yw_host_info(user_id, h["host_id"])
+                # yw_host_info() поля "sqi" не отдаёт (нет в схеме API v4) —
+                # текущий ИКС берём из отдельного эндпоинта sqi-history.
                 return {
-                    "sqi": info.get("sqi"),
+                    "sqi": yw_sqi_latest(user_id, h["host_id"]),
                     "verified": info.get("verified"),
                     "main_mirror": info.get("main_mirror_host_id"),
                 }

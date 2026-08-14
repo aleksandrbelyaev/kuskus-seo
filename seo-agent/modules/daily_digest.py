@@ -181,19 +181,20 @@ def audit_delta_daily(current: dict, max_gap_days: int = 2) -> tuple[int, int]:
 def yandex_webmaster_daily() -> dict:
     """ИКС + дельта ИКС за сутки + страниц в индексе. Мягко падает при ошибках."""
     try:
-        from modules.yandex_webmaster import (
-            yw_resolve_host_id, yw_host_info, yw_sqi_history,
-        )
+        from modules.yandex_webmaster import yw_resolve_host_id, yw_host_info, yw_sqi_history
         user_id, host_id = yw_resolve_host_id(host_url=site_domain())
         info = yw_host_info(user_id, host_id)
-        out = {"sqi": info.get("sqi"), "verified": info.get("verified")}
+        out = {"verified": info.get("verified")}
 
-        # Дельта ИКС из истории (последние 2 точки).
+        # yw_host_info() поля "sqi" не отдаёт (нет в схеме API v4) — берём из
+        # sqi-history: последняя точка = текущий ИКС, предпоследняя — для дельты.
         try:
             date_to = (dt.date.today()).isoformat()
             date_from = (dt.date.today() - dt.timedelta(days=21)).isoformat()
             points = yw_sqi_history(user_id, host_id, date_from, date_to)
             vals = [p.get("value") for p in points if p.get("value") is not None]
+            if vals:
+                out["sqi"] = vals[-1]
             if len(vals) >= 2 and isinstance(vals[-1], int) and isinstance(vals[-2], int):
                 out["sqi_delta"] = vals[-1] - vals[-2]
         except Exception as e:

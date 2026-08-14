@@ -173,6 +173,21 @@ def yw_sqi_history(user_id: int, host_id: str, date_from: str, date_to: str) -> 
     return data.get("points", [])
 
 
+def yw_sqi_latest(user_id: int, host_id: str, days: int = 30) -> Optional[int]:
+    """Текущий ИКС — последняя точка sqi-history.
+
+    hosts/{id}/ (yw_host_info) поля "sqi" не отдаёт вообще (нет в схеме API v4,
+    только verified/host_data_status/...) — единственный источник ИКС это
+    отдельный эндпоинт sqi-history.
+    """
+    import datetime as dt
+    date_to = dt.date.today().isoformat()
+    date_from = (dt.date.today() - dt.timedelta(days=days)).isoformat()
+    points = yw_sqi_history(user_id, host_id, date_from, date_to)
+    values = [p["value"] for p in points if p.get("value") is not None]
+    return values[-1] if values else None
+
+
 if __name__ == "__main__":
     # Smoke-test.
     import datetime as dt
