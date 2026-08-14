@@ -54,7 +54,7 @@ jobs:
 
       - name: Configure git author
         run: |
-          git config user.email "bot@example.com"
+          git config user.email "bot@kuskusgrooming.ru"
           git config user.name "seo-agent"
 
       # Мини-аудит без PageSpeed — быстро (~1 мин). Сам в Telegram не шлёт
@@ -73,8 +73,8 @@ jobs:
           GSC_OAUTH_REFRESH_TOKEN: ${{ secrets.GSC_OAUTH_REFRESH_TOKEN }}
           GSC_OAUTH_CLIENT_ID: ${{ secrets.GSC_OAUTH_CLIENT_ID }}
           GSC_OAUTH_CLIENT_SECRET: ${{ secrets.GSC_OAUTH_CLIENT_SECRET }}
-          GSC_SITE_URL: sc-domain:example.com
-          SEO_SITE_DOMAIN: example.com
+          GSC_SITE_URL: sc-domain:kuskusgrooming.ru
+          SEO_SITE_DOMAIN: kuskusgrooming.ru
           YANDEX_WEBMASTER_TOKEN: ${{ secrets.YANDEX_WEBMASTER_TOKEN }}
           YANDEX_WEBMASTER_USER_ID: ${{ secrets.YANDEX_WEBMASTER_USER_ID }}
           YANDEX_WEBMASTER_HOST_ID: ${{ secrets.YANDEX_WEBMASTER_HOST_ID }}

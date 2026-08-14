@@ -71,7 +71,7 @@ jobs:
 
       - name: Configure git author
         run: |
-          git config user.email "bot@example.com"
+          git config user.email "bot@kuskusgrooming.ru"
           git config user.name "content-factory"
 
       - name: Run orchestrator
@@ -83,7 +83,7 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
 
           EMAIL_FROM: "onboarding@resend.dev"
-          EMAIL_TO: "you@example.com"
+          EMAIL_TO: "you@kuskusgrooming.ru"
           EMAIL_FROM_FALLBACK: "onboarding@resend.dev"
 
           # Параметры запуска
@@ -97,7 +97,7 @@ jobs:
           # SERP-источник: SerpApi (если задан ключ) → иначе Yandex Cloud Search API
           # (Wordstat-ключ, без доп. подписки). Свой домен исключается через SITE_DOMAIN.
           L2_COMPETITIVE: ${{ github.event.inputs.l2_competitive || '0' }}
-          SITE_DOMAIN: example.com
+          SITE_DOMAIN: kuskusgrooming.ru
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
           YANDEX_CLOUD_API_KEY: ${{ secrets.YANDEX_CLOUD_API_KEY }}
           YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
@@ -117,14 +117,14 @@ jobs:
           GSC_OAUTH_REFRESH_TOKEN: ${{ secrets.GSC_OAUTH_REFRESH_TOKEN }}
           GSC_OAUTH_CLIENT_ID: ${{ secrets.GSC_OAUTH_CLIENT_ID }}
           GSC_OAUTH_CLIENT_SECRET: ${{ secrets.GSC_OAUTH_CLIENT_SECRET }}
-          GSC_SITE_URL: sc-domain:example.com
+          GSC_SITE_URL: sc-domain:kuskusgrooming.ru
           YANDEX_WEBMASTER_TOKEN: ${{ secrets.YANDEX_WEBMASTER_TOKEN }}
           YANDEX_WEBMASTER_USER_ID: ${{ secrets.YANDEX_WEBMASTER_USER_ID }}
           YANDEX_WEBMASTER_HOST_ID: ${{ secrets.YANDEX_WEBMASTER_HOST_ID }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          SITE_URL_BASE: https://example.com
-          SITEMAP_URL: https://example.com/sitemap.xml
+          SITE_URL_BASE: https://kuskusgrooming.ru
+          SITEMAP_URL: https://kuskusgrooming.ru/sitemap.xml
         run: |
           pip install google-api-python-client google-auth google-auth-oauthlib requests
           python3 seo-agent/scripts/ping_new_urls.py --from-git-diff --base-ref=${{ github.sha }} --head-ref=HEAD
