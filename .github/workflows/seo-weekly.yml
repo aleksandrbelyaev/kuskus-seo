@@ -109,7 +109,10 @@ jobs:
       - name: Commit & push отчёты
         if: success()
         run: |
-          git add seo-agent/reports/*.md seo-agent/data/eeat/*.json seo-agent/data/linker/*.json seo-agent/data/competitors/*.json || true
+          git add seo-agent/reports/*.md || true
+          git add seo-agent/data/eeat/*.json || true
+          git add seo-agent/data/linker/*.json || true
+          git add seo-agent/data/competitors/*.json || true
           if ! git diff --staged --quiet; then
             DATE=$(date -u +%Y-%m-%d)
             git commit -m "seo-agent: weekly digest ${DATE}

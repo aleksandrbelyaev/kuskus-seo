@@ -81,7 +81,8 @@ jobs:
         if: success()
         run: |
           # audit.json нужен в репо: следующий прогон сравнивает с ним для дельты.
-          git add seo-agent/data/audits/**/report.md seo-agent/data/audits/**/audit.json || true
+          git add seo-agent/data/audits/*/report.md || true
+          git add seo-agent/data/audits/*/audit.json || true
           if ! git diff --staged --quiet; then
             DATE=$(date -u +%Y-%m-%d)
             git commit -m "seo-agent: tech-audit ${DATE}

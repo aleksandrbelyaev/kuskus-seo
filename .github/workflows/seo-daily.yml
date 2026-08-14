@@ -90,9 +90,12 @@ jobs:
       - name: Commit & push (свежий аудит + утренний отчёт)
         if: success()
         run: |
-          git add seo-agent/reports/daily-*.md \
-                  seo-agent/data/audits/**/report.md \
-                  seo-agent/data/audits/**/audit.json || true
+          # Каждый путь отдельной командой: git add с несколькими pathspec падает
+          # целиком, если хоть один не находит файлов (например, аудит в dry-run
+          # ничего не пишет) — тогда не добавится вообще ничего, включая отчёт.
+          git add seo-agent/reports/daily-*.md || true
+          git add seo-agent/data/audits/*/report.md || true
+          git add seo-agent/data/audits/*/audit.json || true
           if ! git diff --staged --quiet; then
             DATE=$(date -u +%Y-%m-%d)
             git commit -m "seo-agent: daily digest ${DATE}

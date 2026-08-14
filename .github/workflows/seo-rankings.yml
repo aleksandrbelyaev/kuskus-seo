@@ -82,7 +82,8 @@ jobs:
         if: success()
         run: |
           # rankings/*.json в gitignore (большие), но *.csv — нужны для дельты.
-          git add seo-agent/data/rankings/*.csv seo-agent/data/rankings/tracked-keywords.json || true
+          git add seo-agent/data/rankings/*.csv || true
+          git add seo-agent/data/rankings/tracked-keywords.json || true
           if ! git diff --staged --quiet; then
             DATE=$(date -u +%Y-%m-%d)
             git commit -m "seo-agent: rankings ${DATE}

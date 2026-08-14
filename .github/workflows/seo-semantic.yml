@@ -82,7 +82,8 @@ jobs:
       - name: Commit & push новые темы + снимок
         if: success()
         run: |
-          git add content-factory/data/topics_backlog.csv seo-agent/data/semantic/*.json || true
+          git add content-factory/data/topics_backlog.csv || true
+          git add seo-agent/data/semantic/*.json || true
           if ! git diff --staged --quiet; then
             DATE=$(date -u +%Y-%m-%d)
             git commit -m "seo-agent: semantic ${DATE}
