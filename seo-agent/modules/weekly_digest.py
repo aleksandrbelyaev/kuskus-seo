@@ -201,6 +201,33 @@ def yandex_webmaster_summary() -> dict:
     return {}
 
 
+def yandex_metrika_summary() -> dict:
+    """Визиты на сайт (Яндекс.Метрика) за последние 7 дней + за предыдущие 7.
+
+    Это ВСЕ визиты (поиск + прямые заходы + реклама + переходы) — не путать
+    с yandex_webmaster/GSC, которые считают только органический поиск.
+    """
+    try:
+        from modules.yandex_metrika import ym_resolve_counter_id, ym_stat_totals
+        counter_id = ym_resolve_counter_id(site_domain())
+
+        end_curr = (dt.date.today() - dt.timedelta(days=1)).isoformat()
+        start_curr = (dt.date.today() - dt.timedelta(days=7)).isoformat()
+        end_prev = (dt.date.today() - dt.timedelta(days=8)).isoformat()
+        start_prev = (dt.date.today() - dt.timedelta(days=14)).isoformat()
+
+        curr = ym_stat_totals(counter_id, start_curr, end_curr)
+        prev = ym_stat_totals(counter_id, start_prev, end_prev)
+        return {
+            "visits_week": curr.get("visits", 0),
+            "users_week": curr.get("users", 0),
+            "delta_visits": curr.get("visits", 0) - prev.get("visits", 0),
+        }
+    except Exception as e:
+        log.warning("Я.Метрика: %s", e)
+    return {}
+
+
 def gsc_traffic_summary() -> dict:
     """Клики и показы за последние 7 дней + за предыдущие 7."""
     try:
@@ -253,6 +280,14 @@ def render_digest(today: dt.date, payload: dict) -> str:
                      f"(на {di:+d})")
         lines.append("\n> «Показы» — сколько раз сайт мелькнул в поиске. «Переходы» — "
                      "сколько человек реально кликнули и зашли.")
+
+    ym = payload.get("yandex_metrika", {})
+    if ym:
+        dv = ym["delta_visits"]
+        lines.append(f"- Всего визитов на сайт (Я.Метрика, все источники): "
+                     f"**{ym['visits_week']}** (на {dv:+d} к прошлой неделе)")
+        lines.append("\n> В отличие от переходов из Google-поиска выше, сюда входят "
+                     "ЛЮБЫЕ визиты: поиск, прямые заходы, реклама, переходы по ссылкам.")
 
     # ── Индекс
     yw = payload.get("yandex_webmaster", {})
@@ -406,6 +441,7 @@ def run_digest(dry_run: bool = False) -> Path:
         "content_published": content_factory_published(week_ago),
         "yandex_webmaster": yandex_webmaster_summary(),
         "traffic": gsc_traffic_summary(),
+        "yandex_metrika": yandex_metrika_summary(),
     }
     audit = payload.get("audit")
     if audit:

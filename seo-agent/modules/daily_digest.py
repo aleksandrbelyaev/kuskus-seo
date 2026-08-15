@@ -85,6 +85,34 @@ def gsc_traffic_daily() -> dict:
         return {}
 
 
+def yandex_metrika_daily() -> dict:
+    """Визиты на сайт (Яндекс.Метрика) за последний доступный день vs предыдущий.
+
+    Это ВСЕ визиты (поиск + прямые заходы + реклама + переходы) — не путать
+    с yandex_webmaster/GSC, которые считают только органический поиск.
+    """
+    try:
+        from modules.yandex_metrika import ym_resolve_counter_id, ym_stat_by_day
+        counter_id = ym_resolve_counter_id(site_domain())
+        start = (dt.date.today() - dt.timedelta(days=10)).isoformat()
+        end = (dt.date.today() - dt.timedelta(days=1)).isoformat()
+        days = ym_stat_by_day(counter_id, start, end)
+        if not days:
+            return {}
+        last = days[-1]
+        prev = days[-2] if len(days) >= 2 else None
+        return {
+            "date": last["date"],
+            "visits": last["visits"],
+            "users": last["users"],
+            "delta_visits": last["visits"] - (prev["visits"] if prev else 0),
+            "has_prev": prev is not None,
+        }
+    except Exception as e:
+        log.warning("Я.Метрика daily: %s", e)
+        return {}
+
+
 def _load_rankings(path: Path) -> dict[str, dict]:
     out: dict[str, dict] = {}
     with path.open(encoding="utf-8") as f:
@@ -230,6 +258,7 @@ def build_payload() -> dict:
         "rankings": rankings_daily(),
         "audit": latest_audit(),
         "yandex_webmaster": yandex_webmaster_daily(),
+        "yandex_metrika": yandex_metrika_daily(),
         "content_published": content_published_yesterday(),
     }
     if payload.get("audit"):
@@ -260,6 +289,15 @@ def render_telegram(today: dt.date, site: str, payload: dict, advice: str) -> st
     else:
         lines.append("\n👥 Трафик из Google: данных пока нет "
                      "(новый домен или Search Console ещё копит статистику).")
+
+    ym = payload.get("yandex_metrika") or {}
+    if ym:
+        dv = ym["delta_visits"]
+        trend = "больше вчерашнего" if dv > 0 else ("меньше вчерашнего" if dv < 0 else "как вчера")
+        lines.append(
+            f"🌐 Все визиты на сайт (Я.Метрика): {ym['visits']} "
+            f"{plural(ym['visits'], 'визит', 'визита', 'визитов')} ({dv:+d} — {trend})."
+        )
 
     r = payload.get("rankings") or {}
     if r and r.get("total"):
